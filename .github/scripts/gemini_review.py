@@ -17,7 +17,7 @@ genai.configure(api_key=None)
 model = genai.GenerativeModel("gemini-pro")
 
 # Lê o diff da PR
-diff_output = os.popen("git diff origin/main...HEAD").read()
+diff_output = os.popen("git diff --diff-filter=AMR --name-only HEAD~1 HEAD").read()
 
 # Envia o diff para análise
 response = model.generate_content(f"Faça uma revisão de código no seguinte diff:\n\n{diff_output}")
