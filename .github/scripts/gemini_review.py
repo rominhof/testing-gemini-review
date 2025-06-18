@@ -14,7 +14,10 @@ with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp:
 # Inicializa a API Gemini
 genai.configure(api_key=None)
 
-model = genai.GenerativeModel("gemini-pro")
+for m in genai.list_models():
+    print(m.name, "-", m.supported_generation_methods)
+
+model = genai.GenerativeModel("models/gemini-1.5-pro-latest")
 
 # Lê o diff da PR
 diff_output = os.popen("git diff --diff-filter=AMR --name-only HEAD~1 HEAD").read()
