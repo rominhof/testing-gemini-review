@@ -52,33 +52,4 @@ def process_and_generate_report(input_file_path, output_file_path, keyword_filte
         else:
             report_content.append("  No lines found with the keyword.")
     else:
-        report_content.append("\n--- No filter keyword applied ---")
-
-    report_content.append("\n" + "="*50)
-
-    try:
-        with open(output_file_path, 'w', encoding='utf-8') as f_out:
-            for report_line in report_content:
-                f_out.write(report_line + '\n')
-        print(f"\nReport successfully generated at: {output_file_path}")
-    except Exception as e:
-        print(f"Error saving report: {e}")
-
-
-if __name__ == "__main__":
-    sample_content = """
-        This is the first line of our test file.
-        It contains some words for counting.
-        It also has the keyword 'demonstration'.
-        Another line of text.
-        Demonstration of functionality.
-        End of test file.
-        """
-    input_filename = "sample_data.txt"
-    output_filename = "analysis_report.txt"
-
-    with open(input_filename, 'w', encoding='utf-8') as f_sample:
-        f_sample.write(sample_content.strip())
-    print(f"Sample file '{input_filename}' created for testing.\n")
-
-    process_and_generate_report(input_filename, output_filename, "demonstration")
+        report_content.append("\n--- No filter
