@@ -1,37 +1,38 @@
 import os
+import logging
+import textwrap
 
 def read_and_analyze(input_file_path, keyword_filter):
-    print(f"Starting file processing: {input_file_path}")
+    logging.info(f"Starting file processing: {input_file_path}")
     
-    file_lines = []
-    try:
-        with open(input_file_path, 'r', encoding='utf-8') as f_in:
-            for line in f_in:
-                file_lines.append(line.strip())
-        print("Input file read successfully.")
-    except FileNotFoundError:
-        print(f"Error: The file '{input_file_path}' was not found.")
-        raise
-    except Exception as e:
-        print(f"Error reading file: {e}")
-        raise
-
-    total_lines = len(file_lines)
+    total_lines = 0
     total_words = 0
     total_characters = 0
-    for line in file_lines:
-        words = line.split()
-        total_words += len(words)
-        total_characters += len(line)
-
-    print("Data processed: counts performed.")
-
     filtered_lines = []
+    
+    try:
+        with open(input_file_path, 'r', encoding='utf-8') as f_in:
+            keyword_lower = keyword_filter.lower() if keyword_filter else None
+            for line in f_in:
+                stripped_line = line.strip()
+                total_lines += 1
+                total_words += len(stripped_line.split())
+                total_characters += len(stripped_line)
+                
+                if keyword_lower and keyword_lower in stripped_line.lower():
+                    filtered_lines.append(stripped_line)
+        logging.info("Input file processed successfully.")
+    except FileNotFoundError:
+        logging.error(f"Error: The file '{input_file_path}' was not found.")
+        raise
+    except OSError as e:
+        logging.error(f"Error reading file: {e}")
+        raise
+
     if keyword_filter:
-        filtered_lines = [line for line in file_lines if keyword_filter.lower() in line.lower()]
-        print(f"Filtering by '{keyword_filter}' completed. {len(filtered_lines)} lines found.")
+        logging.info(f"Filtering by '{keyword_filter}' completed. {len(filtered_lines)} lines found.")
     else:
-        print("No filter keyword provided. Skipping filtering.")
+        logging.info("No filter keyword provided. Skipping filtering.")
 
     return total_lines, total_words, total_characters, filtered_lines
 
@@ -66,22 +67,22 @@ def write_report(output_file_path, report_content):
         with open(output_file_path, 'w', encoding='utf-8') as f_out:
             for report_line in report_content:
                 f_out.write(report_line + '\n')
-        print(f"\nReport successfully generated at: {output_file_path}")
-    except Exception as e:
-        print(f"Error saving report: {e}")
+        logging.info(f"\nReport successfully generated at: {output_file_path}")
+    except OSError as e:
+        logging.error(f"Error saving report: {e}")
 
 def create_sample(input_filename):
-    sample_content = """
+    sample_content = textwrap.dedent("""\
         This is the first line of our test file.
         It contains some words for counting.
         It also has the keyword 'demonstration'.
         Another line of text.
         Demonstration of functionality.
-        End of test file.
-        """
+        End of test file.""")
+
     with open(input_filename, 'w', encoding='utf-8') as f_sample:
         f_sample.write(sample_content.strip())
-    print(f"Sample file '{input_filename}' created for testing.\n")    
+    logging.info(f"Sample file '{input_filename}' created for testing.\n")    
 
 
 if __name__ == "__main__":
