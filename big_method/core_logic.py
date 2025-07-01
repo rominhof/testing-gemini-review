@@ -1,3 +1,4 @@
+from typing import Optional
 import logging
 import textwrap
 from dataclasses import dataclass
@@ -9,9 +10,9 @@ class AnalysisResults:
     total_lines: int
     total_words: int
     total_characters: int
-    filtered_lines: int
+    filtered_lines: list[str]
 
-def read_and_analyze(input_file_path, keyword_filter):
+def read_and_analyze(input_file_path: str, keyword_filter: Optional[str]) -> AnalysisResults:
     logging.info(f"Starting file processing: {input_file_path}")
     
     total_lines = 0
@@ -71,7 +72,7 @@ def generate_report(input_file_path, keyword_filter, analysisResults):
     return report_content
 
 
-def write_report(output_file_path, report_content):
+def write_report(output_file_path:str, report_content:str) -> None:
     try:
         with open(output_file_path, 'w', encoding='utf-8') as f_out:
             for report_line in report_content:
@@ -81,7 +82,7 @@ def write_report(output_file_path, report_content):
         logging.error(f"Error saving report: {e}")
         raise
 
-def create_sample(input_filename):
+def create_sample(input_filename:str) -> None:
     sample_content = textwrap.dedent("""\
         This is the first line of our test file.
         It contains some words for counting.
