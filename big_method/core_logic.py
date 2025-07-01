@@ -1,6 +1,15 @@
-import os
 import logging
 import textwrap
+from dataclasses import dataclass
+
+REPORT_WIDTH = 50
+
+@dataclass
+class AnalysisResults:
+    total_lines: int
+    total_words: int
+    total_characters: int
+    filtered_lines: int
 
 def read_and_analyze(input_file_path, keyword_filter):
     logging.info(f"Starting file processing: {input_file_path}")
@@ -34,30 +43,30 @@ def read_and_analyze(input_file_path, keyword_filter):
     else:
         logging.info("No filter keyword provided. Skipping filtering.")
 
-    return total_lines, total_words, total_characters, filtered_lines
+    return AnalysisResults(total_lines, total_words, total_characters, filtered_lines)
 
 
-def generate_report(input_file_path, total_lines, total_words, total_characters, keyword_filter, filtered_lines):
+def generate_report(input_file_path, keyword_filter, analysisResults):
     report_content = []
-    report_content.append("="*50)
+    report_content.append("="*REPORT_WIDTH)
     report_content.append("           FILE ANALYSIS REPORT           ")
-    report_content.append("="*50)
+    report_content.append("="*REPORT_WIDTH)
     report_content.append(f"\nAnalyzed File: {input_file_path}")
-    report_content.append(f"Total Lines: {total_lines}")
-    report_content.append(f"Total Words: {total_words}")
-    report_content.append(f"Total Characters: {total_characters}")
+    report_content.append(f"Total Lines: {analysisResults.total_lines}")
+    report_content.append(f"Total Words: {analysisResults.total_words}")
+    report_content.append(f"Total Characters: {analysisResults.total_characters}")
 
     if keyword_filter:
-        report_content.append(f"\n--- Lines Containing '{keyword_filter}' ({len(filtered_lines)} lines) ---")
-        if filtered_lines:
-            for i, f_line in enumerate(filtered_lines):
+        report_content.append(f"\n--- Lines Containing '{keyword_filter}' ({len(analysisResults.filtered_lines)} lines) ---")
+        if analysisResults.filtered_lines:
+            for i, f_line in enumerate(analysisResults.filtered_lines):
                 report_content.append(f"  {i+1}. {f_line}")
         else:
             report_content.append("  No lines found with the keyword.")
     else:
         report_content.append("\n--- No filter keyword applied ---")
 
-    report_content.append("\n" + "="*50)
+    report_content.append("\n" + "="*REPORT_WIDTH)
 
     return report_content
 
@@ -70,6 +79,7 @@ def write_report(output_file_path, report_content):
         logging.info(f"\nReport successfully generated at: {output_file_path}")
     except OSError as e:
         logging.error(f"Error saving report: {e}")
+        raise
 
 def create_sample(input_filename):
     sample_content = textwrap.dedent("""\
@@ -93,8 +103,8 @@ if __name__ == "__main__":
     # Create sample file to be processed   
     create_sample(input_filename)
     # Process the report
-    total_lines, total_words, total_characters, filtered_lines = read_and_analyze(input_filename,keyword_filter)
+    analysisResults = read_and_analyze(input_filename,keyword_filter)
     # Generate Report
-    report_content = generate_report(input_filename, total_lines, total_words, total_characters, keyword_filter, filtered_lines)
+    report_content = generate_report(input_filename, keyword_filter, analysisResults)
     # Write output
     write_report(output_filename, report_content)
