@@ -1,6 +1,6 @@
 import os
 
-def process_and_generate_report(input_file_path, output_file_path, keyword_filter):
+def read_and_analyze(input_file_path, keyword_filter):
     print(f"Starting file processing: {input_file_path}")
     
     file_lines = []
@@ -11,10 +11,10 @@ def process_and_generate_report(input_file_path, output_file_path, keyword_filte
         print("Input file read successfully.")
     except FileNotFoundError:
         print(f"Error: The file '{input_file_path}' was not found.")
-        return
+        raise
     except Exception as e:
         print(f"Error reading file: {e}")
-        return
+        raise
 
     total_lines = len(file_lines)
     total_words = 0
@@ -28,13 +28,15 @@ def process_and_generate_report(input_file_path, output_file_path, keyword_filte
 
     filtered_lines = []
     if keyword_filter:
-        for line in file_lines:
-            if keyword_filter.lower() in line.lower():
-                filtered_lines.append(line)
+        filtered_lines = [line for line in file_lines if keyword_filter.lower() in line.lower()]
         print(f"Filtering by '{keyword_filter}' completed. {len(filtered_lines)} lines found.")
     else:
         print("No filter keyword provided. Skipping filtering.")
 
+    return total_lines, total_words, total_characters, filtered_lines
+
+
+def generate_report(input_file_path, total_lines, total_words, total_characters, keyword_filter, filtered_lines):
     report_content = []
     report_content.append("="*50)
     report_content.append("           FILE ANALYSIS REPORT           ")
@@ -56,6 +58,10 @@ def process_and_generate_report(input_file_path, output_file_path, keyword_filte
 
     report_content.append("\n" + "="*50)
 
+    return report_content
+
+
+def write_report(output_file_path, report_content):
     try:
         with open(output_file_path, 'w', encoding='utf-8') as f_out:
             for report_line in report_content:
@@ -64,8 +70,7 @@ def process_and_generate_report(input_file_path, output_file_path, keyword_filte
     except Exception as e:
         print(f"Error saving report: {e}")
 
-
-if __name__ == "__main__":
+def create_sample(input_filename):
     sample_content = """
         This is the first line of our test file.
         It contains some words for counting.
@@ -74,11 +79,21 @@ if __name__ == "__main__":
         Demonstration of functionality.
         End of test file.
         """
-    input_filename = "sample_data.txt"
-    output_filename = "analysis_report.txt"
-
     with open(input_filename, 'w', encoding='utf-8') as f_sample:
         f_sample.write(sample_content.strip())
-    print(f"Sample file '{input_filename}' created for testing.\n")
+    print(f"Sample file '{input_filename}' created for testing.\n")    
 
-    process_and_generate_report(input_filename, output_filename, "demonstration")
+
+if __name__ == "__main__":
+    input_filename = "sample_data.txt"
+    output_filename = "analysis_report.txt" 
+    keyword_filter = "demonstration"
+   
+    # Create sample file to be processed   
+    create_sample(input_filename)
+    # Process the report
+    total_lines, total_words, total_characters, filtered_lines = read_and_analyze(input_filename,keyword_filter)
+    # Generate Report
+    report_content = generate_report(input_filename, total_lines, total_words, total_characters, keyword_filter, filtered_lines)
+    # Write output
+    write_report(output_filename, report_content)
